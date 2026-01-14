@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Adapting Video Foundation Models for Spatiotemporal Wildfire Forecasting via Cross-Modal Progressive Fine-Tuning</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Project page for 'Adapting Video Foundation Models for Spatiotemporal Wildfire Forecasting via Cross-Modal Progressive Fine-Tuning'."
+  />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #faf9f7;
+      --bg-alt: #ffffff;
+      --bg-dark: #1c1917;
+      --text: #1c1917;
+      --text-secondary: #44403c;
+      --muted: #78716c;
+      --accent: #c2410c;
+      --accent-hover: #9a3412;
+      --accent-soft: #fff7ed;
+      --accent-warm: #ea580c;
+      --ember: #f97316;
+      --border: #e7e5e4;
+      --border-strong: #d6d3d1;
+      --radius-lg: 1rem;
+      --radius-md: 0.625rem;
+      --shadow-soft: 0 1px 3px rgba(28, 25, 23, 0.06), 0 8px 24px rgba(28, 25, 23, 0.08);
+      --shadow-elevated: 0 4px 12px rgba(28, 25, 23, 0.08), 0 24px 48px rgba(28, 25, 23, 0.12);
+      --font-display: "Fraunces", Georgia, serif;
+      --font-body: "DM Sans", system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      background: var(--bg);
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(251, 146, 60, 0.08), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(254, 215, 170, 0.15), transparent);
+      color: var(--text);
+      line-height: 1.65;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    a:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* Header */
+    header {
+      margin: 0 auto 2rem;
+      padding: 2.5rem 2rem 2rem;
+      background: var(--bg-dark);
+      border-radius: var(--radius-lg);
+      color: #fafaf9;
+      box-shadow: var(--shadow-elevated);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--ember), var(--accent-warm), #fbbf24);
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 0% 0%, rgba(249, 115, 22, 0.12), transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(251, 146, 60, 0.08), transparent 50%);
+      pointer-events: none;
+    }
+
+    .header-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .venue-badge {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fbbf24;
+      margin-bottom: 0.75rem;
+    }
+
+    .title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 2.2vw + 0.8rem, 2.25rem);
+      font-weight: 600;
+      margin: 0 0 1.25rem;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      color: #fafaf9;
+    }
+
+    .authors {
+      margin: 0 0 0.35rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #e7e5e4;
+    }
+
+    .affiliations {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #a8a29e;
+      line-height: 1.5;
+    }
+
+    .tagline {
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(168, 162, 158, 0.2);
+      font-size: 0.9rem;
+      color: #d6d3d1;
+      max-width: 38rem;
+      line-height: 1.6;
+    }
+
+    .tagline strong {
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    .pill-row {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+    }
+
+    .pill {
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      border: 1px solid rgba(168, 162, 158, 0.25);
+      background: rgba(255, 255, 255, 0.06);
+      color: #d6d3d1;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: none;
+      background: #fafaf9;
+      color: var(--bg-dark);
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: #f5f5f4;
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      border: 1px solid rgba(168, 162, 158, 0.4);
+      color: #e7e5e4;
+    }
+
+    .btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(168, 162, 158, 0.6);
+    }
+
+    .btn span.icon {
+      font-size: 1em;
+    }
+
+    /* Navigation */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(250, 249, 247, 0.85);
+      border-bottom: 1px solid var(--border);
+      margin: 0 -1.5rem 1.75rem;
+    }
+
+    .nav-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0.5rem 1.5rem;
+      display: flex;
+      gap: 0.25rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-inner::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-link {
+      padding: 0.4rem 0.75rem;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .nav-link:hover {
+      background: rgba(28, 25, 23, 0.05);
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    /* Main content */
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    section {
+      background: var(--bg-alt);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 1.75rem 1.5rem;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border);
+    }
+
+    h2 {
+      font-family: var(--font-display);
+      margin: 0 0 1rem;
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    h2::after {
+      content: "";
+      display: block;
+      width: 2rem;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--ember));
+      margin-top: 0.5rem;
+      border-radius: 1px;
+    }
+
+    h3 {
+      font-family: var(--font-display);
+      margin: 1.25rem 0 0.5rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    p {
+      margin: 0 0 0.75rem;
+      font-size: 0.925rem;
+      color: var(--text-secondary);
+    }
+
+    ul {
+      margin: 0.25rem 0 0.85rem 1.25rem;
+      padding: 0;
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+    }
+
+    li + li {
+      margin-top: 0.35rem;
+    }
+
+    li strong {
+      color: var(--text);
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+      gap: 1.75rem;
+      align-items: flex-start;
+    }
+
+    .figure-placeholder {
+      position: relative;
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--border-strong);
+      background: linear-gradient(135deg, #fafaf9, #f5f5f4);
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .figure-placeholder small {
+      display: block;
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      opacity: 0.85;
+      line-height: 1.5;
+    }
+
+    .figure-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    code,
+    pre {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    pre {
+      margin: 0.5rem 0 0;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-dark);
+      color: #e7e5e4;
+      overflow-x: auto;
+      border: 1px solid #292524;
+      line-height: 1.5;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(194, 65, 12, 0.15);
+    }
+
+    .resource-list {
+      list-style: none;
+      margin: 0.5rem 0 0;
+      padding: 0;
+      font-size: 0.9rem;
+    }
+
+    .resource-list li {
+      margin-bottom: 0.5rem;
+      padding-left: 0;
+    }
+
+    .resource-list a {
+      font-weight: 500;
+    }
+
+    .resource-tag {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-left: 0.4rem;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page {
+        padding: 1.25rem 1rem 3rem;
+      }
+
+      header {
+        border-radius: 0.75rem;
+        padding: 1.75rem 1.25rem 1.5rem;
+      }
+
+      section {
+        border-radius: 0.75rem;
+        padding: 1.25rem 1.25rem 1rem;
+      }
+
+      nav {
+        margin: 0 -1rem 1.5rem;
+      }
+
+      .nav-inner {
+        padding: 0.5rem 1rem;
+      }
+
+      .two-col {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      h2::after {
+        margin-top: 0.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="header-inner">
+        <span class="venue-badge">IEEE Transactions on Geoscience and Remote Sensing · 2026</span>
+        <h1 class="title">
+          Adapting Video Foundation Models for Spatiotemporal Wildfire Forecasting via Cross-Modal Progressive Fine-Tuning
+        </h1>
+        <p class="authors">
+          Wenwen Li&ensp;·&ensp;Chia-Yu Hsu&ensp;·&ensp;Sizhe Wang
+        </p>
+        <p class="affiliations">
+          School of Geographical Sciences and Urban Planning &amp; School of Computing and Augmented Intelligence<br />
+          Arizona State University
+        </p>
+
+        <p class="tagline">
+          We adapt large video foundation models to multi-modal satellite data and propose
+          <strong>Cross-Modal Progressive Fine-Tuning (CMPF)</strong> for high-resolution, next-day wildfire spread forecasting.
+        </p>
+
+        <div class="pill-row">
+          <span class="pill">Wildfire Spread Forecasting</span>
+          <span class="pill">Video Foundation Models</span>
+          <span class="pill">GeoAI</span>
+          <span class="pill">Spatiotemporal Modeling</span>
+          <span class="pill">Transformer</span>
+        </div>
+
+        <div class="cta-row">
+          <!-- TODO: update links -->
+          <a class="btn" href="paper.pdf">
+            <span class="icon">📄</span>
+            Paper (PDF)
+          </a>
+          <a class="btn secondary" href="https://github.com/ASUcicilab/wildfire-forecasting">
+            <span class="icon">💻</span>
+            Code 
+          </a>
+          <a class="btn secondary" href="#bibtex">
+            <span class="icon">📚</span>
+            BibTeX
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <nav>
+      <div class="nav-inner">
+        <a class="nav-link" href="#overview">Overview</a>
+        <a class="nav-link" href="#abstract">Abstract</a>
+        <a class="nav-link" href="#method">Method</a>
+        <a class="nav-link" href="#results">Experiments</a>
+        <a class="nav-link" href="#datasets">Datasets</a>
+        <a class="nav-link" href="#bibtex">BibTeX</a>
+      </div>
+    </nav>
+
+    <main>
+      <!-- Overview -->
+      <section id="overview">
+        <div class="figure-grid">
+          <img src="assets/fig_arch.png" alt="Teaser" width="90%"/>
+        </div>
+        <h2>Overview</h2>
+        <p>
+          Wildfires are increasingly frequent and severe, motivating the need for accurate, high-resolution
+          <strong>spatiotemporal wildfire spread forecasts</strong> from satellite data. While large foundation models have reshaped
+          AI, applying them directly to geospatial data is difficult due to domain gaps and limited labeled data.
+        </p>
+        <p>
+          In this work we explore <strong>video foundation models</strong> (e.g., VideoMAEv2) for wildfire spread prediction using
+          multi-modal satellite and environmental inputs, and introduce a training strategy called
+          <strong>Cross-Modal Progressive Fine-Tuning (CMPF)</strong>.
+        </p>
+
+        <h3>Contributions</h3>
+        <ul>
+          <li>
+            <strong>Cross-Modal Progressive Fine-Tuning (CMPF):</strong>
+            a two-stage adaptation strategy that (1) selects video-centric transformer backbones aligned with the
+            spatiotemporal nature of wildfire dynamics, and (2) progressively fine-tunes them via an intermediate
+            geospatial task before the final wildfire forecasting task.
+          </li>
+          <li>
+            <strong>Architectural study of foundation models:</strong>
+            comparison of ViT, MViTv2, and VideoMAEv2 for multi-temporal wildfire forecasting, demonstrating the
+            advantages of video-based pretraining.
+          </li>
+          <li>
+            <strong>Progressive training &amp; data efficiency:</strong>
+            CMPF improves Average Precision over direct fine-tuning, accelerates convergence, and yields robust gains
+            across fire sizes, seasons, and regions.
+          </li>
+        </ul>
+      </section>
+
+      <!-- Abstract -->
+      <section id="abstract">
+        <h2>Abstract</h2>
+        <p>
+          Wildfires pose escalating threats to ecosystems, communities, and climate systems, highlighting the urgent need for accurate, high-resolution spatiotemporal forecasting. In this work, we explore the untapped potential of video foundation models for advancing wildfire spread prediction using multimodal satellite data. While large-scale foundation models have transformed artificial intelligence and show promise in Geospatial Artificial Intelligence (GeoAI), their direct application to domain-specific tasks like wildfire forecasting faces two major hurdles: (1) a substantial domain gap between general pretraining data (e.g., natural images and videos) and geospatial data (e.g., multispectral satellite imagery), and (2) limited labeled data for fine-tuning in real-world GeoAI tasks.
+        </p>
+        <p>
+          To address these challenges, we introduce a <strong>Cross-Modal Progressive Fine-Tuning (CMPF)</strong> strategy tailored for wildfire forecasting. CMPF combines: (1) informed cross-modal architectural alignment, leveraging video-based Transformers pretrained on spatiotemporal tasks to better capture wildfire dynamics, and (2) progressive fine-tuning, which gradually adapts models to wildfire-specific representations through intermediate domain adaptation before task-specific tuning.
+        </p>
+        <p>
+          We evaluate CMPF using multiple Transformer backbones, including ViT, MViTv2, and VideoMAEv2, on wildfire spread forecasting benchmarks. Our results show that video foundation models, especially when fine-tuned progressively, outperform conventional CNNs and static vision Transformers in modeling wildfire evolution. These findings also validate the effectiveness of the proposed CMPF approach for adapting general-purpose AI foundation models to complex spatiotemporal geospatial tasks.
+        </p>
+      </section>
+
+      <!-- Method -->
+      <section id="method">
+        <h2>Method: Cross-Modal Progressive Fine-Tuning (CMPF)</h2>
+        <p>
+          CMPF is designed to bridge both the <strong>modality gap</strong> (natural videos vs. satellite time series) and the
+          <strong>data gap</strong> (limited labeled wildfire events) when adapting large video foundation models to GeoAI tasks.
+        </p>
+
+        <div class="badge-row">
+          <span class="badge">VideoMAEv2 backbone</span>
+          <span class="badge">ViT / MViTv2 baselines</span>
+          <span class="badge">Focal Loss</span>
+          <span class="badge">Spatio-temporal patching</span>
+        </div>
+
+        <h3>1. Informed cross-modal architectural choice</h3>
+        <p>
+          We compare three transformer families:
+        </p>
+        <ul>
+          <li><strong>Vision Transformer (ViT):</strong> image-based, with temporal information encoded via channel stacking.</li>
+          <li>
+            <strong>MViTv2:</strong> multiscale, hierarchical vision transformer with progressive spatial downsampling for
+            multi-scale feature learning.
+          </li>
+          <li>
+            <strong>VideoMAEv2:</strong> video foundation model with native 3D spatio-temporal patching and pretraining on
+            large-scale video datasets.
+          </li>
+        </ul>
+        <p>
+          For ViT and MViTv2, multi-temporal inputs are formed by stacking daily frames along the channel dimension, which
+          requires re-initializing the first patch-embedding layer. In contrast, VideoMAEv2 can preserve its pretrained
+          patch-embedding weights after a domain-specific pretraining stage, making it better aligned with spatiotemporal
+          wildfire dynamics.
+        </p>
+
+        <div style="text-align: center; margin: 1rem 0;">
+          <img src="assets/fig_tokens.png" alt="Tokenization" style="max-width: 60%;" />
+        </div>
+
+        <h3>2. Progressive fine-tuning</h3>
+        <ul>
+          <li>
+            <strong>Stage 1 – Input adaptation:</strong> adapt the patch embedding to the geospatial channel configuration
+            (multi-modal satellite &amp; environmental inputs) and attach a task-specific segmentation head for next-day active
+            fire prediction.
+          </li>
+          <li>
+            <strong>Stage 2 – Intermediate geospatial adaptation:</strong> fine-tune on a large auxiliary wildfire dataset
+            (<em>NextDayWildfireSpread</em>) using only modalities shared with the target dataset, with focal loss to handle
+            extreme class imbalance.
+          </li>
+          <li>
+            <strong>Stage 3 – Target-task specialization:</strong> fine-tune the intermediately adapted model on the target
+            <em>WildfireSpreadTS</em> dataset, using all available modalities and multi-day input sequences (e.g., 1-day vs.
+            5-day histories).
+          </li>
+        </ul>
+      </section>
+
+      <!-- Experiments & results -->
+      <section id="results">
+        <h2>Experiments &amp; Results</h2>
+        <p>
+          We evaluate CMPF on the <strong>WildfireSpreadTS</strong> dataset for next-day active fire prediction at 375&nbsp;m
+          resolution, using both <strong>1-day</strong> and <strong>5-day</strong> input sequences. Average Precision (AP) on the
+          active fire class is the primary metric.
+        </p>
+
+        <h3>Architectural comparison (direct fine-tuning)</h3>
+        <ul>
+          <li>
+            VideoMAEv2 consistently outperforms ViT and MViTv2 when directly fine-tuned on WildfireSpreadTS, for both 1-day
+            and 5-day inputs.
+          </li>
+          <li>
+            All transformer models outperform CNN baselines such as U-Net, ConvLSTM, and UTAE, despite having many more
+            parameters.
+          </li>
+        </ul>
+
+        <div style="text-align: center; margin: 1rem 0;">
+          <img src="assets/fig_exp1.png" alt="Experimental Results" style="max-width: 90%;" />
+        </div>
+
+        <h3>Impact of CMPF (progressive fine-tuning)</h3>
+        <ul>
+          <li>
+            Introducing the intermediate adaptation stage improves AP over direct fine-tuning for all transformer backbones.
+          </li>
+          <li>
+            For VideoMAEv2, CMPF yields up to ~3% AP improvement and faster convergence (reaching baseline performance in
+            fewer total epochs).
+          </li>
+          <li>
+            Using the shared-modalities strategy in both stages (Strategy S1) achieves the strongest performance and is
+            robust across architectures.
+          </li>
+        </ul>
+
+        <div style="text-align: center; margin: 1rem 0;">
+          <img src="assets/fig_exp2.png" alt="Experimental Results" style="max-width: 90%;" />
+        </div>
+
+        <h3>Robustness across fire characteristics &amp; regions</h3>
+        <ul>
+          <li>
+            CMPF improves detection of <strong>small fires</strong> (few pixels) as well as medium and large events, mitigating
+            severe class imbalance.
+          </li>
+          <li>
+            Gains are consistent across <strong>seasons</strong> (summer/fall fires dominate) and across Western US states including
+            California, Oregon, Idaho, and Montana.
+          </li>
+        </ul>
+
+        <div style="text-align: center; margin: 1rem 0;">
+          <img src="assets/fig_exp3.png" alt="Experimental Results" style="max-width: 90%;" />
+        </div>
+
+        <h3>Impact of auxiliary data volume</h3>
+        <ul>
+          <li>
+            Increasing the amount of auxiliary NextDayWildfireSpread data in the intermediate stage steadily improves AP on WildfireSpreadTS, with the largest gains between 0–50% of the auxiliary data.
+          </li>
+          <li>
+            Performance begins to plateau beyond ~75% of the auxiliary dataset: using 100% yields the best AP (up to 0.407 for (T=5)), but only marginally improves over 75%, suggesting a practical trade-off point between accuracy and compute.
+          </li>
+        </ul>
+
+        <div style="text-align: center; margin: 1rem 0;">
+          <img src="assets/fig_exp4.png" alt="Experimental Results" style="max-width: 60%;" />
+        </div>
+
+        <h3>Training efficiency</h3>
+        <ul>
+          <li>
+            Compared to direct fine-tuning, CMPF reaches the same or better AP in substantially fewer total epochs.
+          </li>
+          <li>
+            With 40–60 intermediate epochs on the auxiliary dataset, the model matches or surpasses the direct fine-tuning baseline in roughly half the total training budget, demonstrating that progressive fine-tuning is both more accurate and more computationally efficient.
+          </li>
+        </ul>
+
+        <div style="text-align: center; margin: 1rem 0;">
+          <img src="assets/fig_exp5.png" alt="Experimental Results" style="max-width: 60%;" />
+        </div>
+
+        <h3>Interpretability and feature usage</h3>
+        <ul>
+          <li>
+            Mutual information analysis shows that CMPF’s reliance on each input feature closely follows the feature’s intrinsic relevance to the ground truth, with near-perfect rank alignment between feature–ground-truth and feature–model dependencies.
+          </li>
+          <li>
+            Physically meaningful drivers such as active fire presence, wind, and temperature exhibit the highest dependence, indicating that CMPF bases its predictions on plausible geophysical controls rather than spurious correlations.
+          </li>
+          <li>
+            Integrated Gradients–based spatial attributions further confirm that CMPF focuses on coherent regions (e.g., fire perimeters, dry and vegetated areas, topographic gradients), and that the relative importance of variables adapts sensibly across different fire events.
+          </li>
+        </ul>
+
+        <div style="text-align: center; margin: 1rem 0;">
+          <img src="assets/fig_exp6.png" alt="Experimental Results" style="max-width: 90%;" />
+        </div>
+
+        <div style="text-align: center; margin: 1rem 0;">
+          <img src="assets/fig_exp7.png" alt="Experimental Results" style="max-width: 90%;" />
+        </div>
+      </section>
+      
+      <!-- Datasets -->
+      <section id="datasets">
+        <h2>Datasets</h2>
+        <h3>Target task: WildfireSpreadTS</h3>
+        <ul>
+          <li>
+            Multi-modal, multi-temporal dataset for next-day wildfire spread forecasting across the United States.
+          </li>
+          <li>
+            607 fire events, 13,607 daily image sets, 375&nbsp;m spatial resolution.
+          </li>
+          <li>
+            23 input channels including fuel, topography, historic &amp; forecast weather, and vegetation indices (e.g., NDVI,
+            EVI2).
+          </li>
+        </ul>
+
+        <h3>Auxiliary task: NextDayWildfireSpread</h3>
+        <ul>
+          <li>
+            Large-scale wildfire dataset (18,545 fire events, 2012–2020) for 1-day lead wildfire spread prediction at 1&nbsp;km
+            resolution.
+          </li>
+          <li>
+            12 input variables including active fire, fuel, topography, and meteorological conditions.
+          </li>
+        </ul>
+
+        <ul class="resource-list">
+          <!-- TODO: update with real URLs -->
+          <li>
+            <a href="https://github.com/SebastianGer/WildfireSpreadTS">WildfireSpreadTS dataset</a>
+          </li>
+          <li>
+            <a href="https://ieeexplore.ieee.org/document/9840400">NextDayWildfireSpread dataset</a>
+          </li>
+        </ul>
+      </section>
+
+      <!-- BibTeX -->
+      <section id="bibtex">
+        <h2>BibTeX</h2>
+        <pre>@ARTICLE{11343839,
+          author={Li, Wenwen and Hsu, Chia-Yu and Wang, Sizhe},
+          journal={IEEE Transactions on Geoscience and Remote Sensing}, 
+          title={Adapting Video Foundation Models for Spatiotemporal Wildfire Forecasting via Cross-Modal Progressive Fine-Tuning}, 
+          year={2026},
+          volume={},
+          number={},
+          pages={1-1},
+          keywords={Foundation models;Geospatial analysis;Wildfires;Forecasting;Artificial intelligence;Adaptation models;Videos;Transformers;Data models;Spatiotemporal phenomena;Geospatial Artificial Intelligence (GeoAI);Foundation Models;Spatiotemporal Forecasting;Wildfire Spread Prediction;Progressive Fine-tuning;Earth Observation;Satellite Imagery;Vision Transformer;Deep Learning},
+          doi={10.1109/TGRS.2026.3652453}}
+        </pre>
+    </main>
+
+    <footer>
+      &copy; <!-- TODO: update year --> 2026 Wenwen Li, Chia-Yu Hsu, and Sizhe Wang. All rights reserved.
+    </footer>
+  </div>
+</body>
+</html>
